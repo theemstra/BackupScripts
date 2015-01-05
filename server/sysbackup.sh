@@ -12,8 +12,8 @@ remote[1]="root@{YOUR_HOST2}:/volume1/Backups/${backupname}"
 sshport[0]="22"
 sshport[1]="9021"
 ## Where is the remote rotations script located?
-remoterotate[0]="root@{YOUR_HOST1} /root/scripts/backup/${backupname}-sys-rotate.sh"
-remoterotate[1]="root@{YOUR_HOST2} /volume1/Backups/scripts/${backupname}-sys-rotate.sh"
+remoterotate[0]="root@{YOUR_HOST1} /root/scripts/backup/${backupname}-rotate.sh"
+remoterotate[1]="root@{YOUR_HOST2} /volume1/Backups/scripts/${backupname}-rotate.sh"
 ## Your database password (if you do not have automatic mysql sign-in set up)
 DB_PASSWORD="YOUR_PASSWORD"
 
