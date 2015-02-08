@@ -10,7 +10,7 @@ Use the cronjob system to schedule the scripts usage, you could use the cronic s
 The server directory is to be used on the machine that has to be backed-up.
 The remote directory is to be used on the machine(s) that store the backup files.
 
-Licence
+License
 =============
 
 This software is developed by XSByte (www.xsbyte.com) and is released under the GNU GENERAL PUBLIC LICENSE V2 license.
