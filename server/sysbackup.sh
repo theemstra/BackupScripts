@@ -36,25 +36,29 @@ backupname="{YOUR BACKUP NAME}"
 ## Where we'll prepare the backup for packaging
 spooler="/var/spool/backup-prepare/system/"
 
+## Your remote server hostname(s)
+host[0]="myserver.sys.mycompany.tld"
+host[1]="mysecond.sts.mycompany.tld"
+
 ## Your remote server locations (Comment one out if you only use one)
-remote[0]="root@{YOUR_HOST1}:/backups/${backupname}/"
-remote[1]="root@{YOUR_HOST2}:/volume1/Backups/${backupname}"
+remote[0]="root@${HOST[0]}:/home/backups/${backupname}/"
+remote[1]="root@${HOST[1]}:/volume1/Backups/${backupname}"
 
 ## Your SSH ports (22 by default)
 sshport[0]="22"
-sshport[1]="9021"
+sshport[1]="9901"
 
 ## Where is the remote rotations script located?
 remoterotate[0]="root@{YOUR_HOST1} /root/scripts/backup/${backupname}-rotate.sh"
 remoterotate[1]="root@{YOUR_HOST2} /volume1/Backups/scripts/${backupname}-rotate.sh"
 
-## Your database password (if you do not have automatic mysql sign-in set up)
+## Your database password if you do not have automatic mysql sign-in set up (leave empty if you have it set up)
 DB_PASSWORD="YOUR_PASSWORD"
 
-############
+####################
 
 
-## We're checking if the folders exsist, if not, let's create them
+## We're checking if the folders exist, if not, let's create them
 if [ ! -d ${spooler} ]; then
         mkdir -p ${spooler}
 fi
@@ -78,9 +82,9 @@ rmdir ${spooler}part/conf
 
 ## Add your custom locations or backup instructions here
 ## An example is added where we would like to exclude extra backups (they are sql.bz2 files)
-tar --ignore-failed-read -cpz --warning=no-file-changed -f ${spooler}part/var-www.tar.gz -C / var/www --exclude='*.sql.bz2' --exclude='*.tar.bz2'
-tar -cpz --warning=no-file-changed -f ${spooler}part/root.tar.gz -C / root
-tar -cpz --warning=no-file-changed -f ${spooler}part/mail.tar.gz -C / var/mail
+tar -cpz --warning=no-file-changed --warning=no-file-removed -f ${spooler}part/var-www.tar.gz -C / var/www --exclude='*.sql.bz2' --exclude='*.tar.bz2'
+tar -cpz --warning=no-file-changed --warning=no-file-removed -f ${spooler}part/root.tar.gz -C / root
+tar -cpz --warning=no-file-changed --warning=no-file-removed -f ${spooler}part/mail.tar.gz -C / var/mail
 
 ## Before we're going to pack, let's optimize the databases
 mysqlcheck -u root -p --auto-repair --optimize --all-databases | grep -v ^performance_schema$

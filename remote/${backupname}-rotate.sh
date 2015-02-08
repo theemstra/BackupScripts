@@ -23,12 +23,19 @@
 
 #
 ## Make sure to change the name of this file to reflect the backup name!
+## Also fill out the location below
 #
+
+###### Config ######
+
+## Add the location to your backup dir here eg(/home/user/backups/machinename/)
+location="/home/user/backups/machinename/"
+
+####################
 
 basename=$1
 numbertokeep=$2
 ## This location has to match the server backup's location for the rotate to work.
-location="LOCATION_HERE"
 
 loopstart=$((numbertokeep-1))
 
