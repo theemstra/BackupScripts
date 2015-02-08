@@ -1,4 +1,4 @@
-backupScripts
+BackupScripts
 =============
 
 A set of small scripts that will provide backups, including the rotation of the backups.
