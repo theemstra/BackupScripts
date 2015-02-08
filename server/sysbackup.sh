@@ -53,6 +53,7 @@ remoterotate[0]="root@{YOUR_HOST1} /root/scripts/backup/${backupname}-rotate.sh"
 remoterotate[1]="root@{YOUR_HOST2} /volume1/Backups/scripts/${backupname}-rotate.sh"
 
 ## Your database password if you do not have automatic mysql sign-in set up (leave empty if you have it set up)
+## It is not recommended to put your root password in here, because it would be readable via top and ps ax.
 DB_PASSWORD="YOUR_PASSWORD"
 
 ####################
@@ -90,7 +91,7 @@ tar -cpz --warning=no-file-changed --warning=no-file-removed -f ${spooler}part/m
 mysqlcheck -u root -p --auto-repair --optimize --all-databases | grep -v ^performance_schema$
 
 ## Let's loop through all databases and pack them
-for dbname in `mysql -p --batch -e \
+for dbname in `mysql --password=${DB_PASSWORD} --batch -e \
          "show databases" | grep -v ^performance_schema$ | grep -v "mysql" | grep  -v "test" | tail -n +3`
 do
         mysqldump $dbname --password=${DB_PASSWORD} | gzip > ${spooler}part/db/${dbname}.sql.gz

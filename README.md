@@ -14,7 +14,8 @@ Licence
 =============
 
 This software is developed by XSByte (www.xsbyte.com) and is released under the GNU GENERAL PUBLIC LICENSE V2 license.
-The scripts carry the following copyright?
+
+The scripts carry the following copyright:
 Copyright XSByte 2010-2015 - All Rights reserved
 
 Contact
