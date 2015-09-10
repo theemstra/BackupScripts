@@ -16,9 +16,10 @@ License
 This software is developed by XSbyte (www.xsbyte.com) and is released under the GNU GENERAL PUBLIC LICENSE V2 license.
 
 The scripts carry the following copyright:
-Copyright XSbyte 2010-2015 - All Rights reserved
+Copyright XSbyte 2010-2015
+
 
 Contact
 =============
-Ideas, PR's welcome!
-Contact me on thom@heemstra.us
+Ideas and PR's welcome!
+Contact me on thom AT heemstra.us
