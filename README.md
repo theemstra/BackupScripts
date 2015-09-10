@@ -13,10 +13,10 @@ The remote directory is to be used on the machine(s) that store the backup files
 License
 =============
 
-This software is developed by XSByte (www.xsbyte.com) and is released under the GNU GENERAL PUBLIC LICENSE V2 license.
+This software is developed by XSbyte (www.xsbyte.com) and is released under the GNU GENERAL PUBLIC LICENSE V2 license.
 
 The scripts carry the following copyright:
-Copyright XSByte 2010-2015 - All Rights reserved
+Copyright XSbyte 2010-2015 - All Rights reserved
 
 Contact
 =============
