@@ -56,6 +56,9 @@ remoterotate[1]="root@{YOUR_HOST2} /volume1/Backups/scripts/${backupname}-rotate
 ## It is not recommended to put your root password in here, because it would be readable via top and ps ax.
 DB_PASSWORD="YOUR_PASSWORD"
 
+## Your S3 bukket name (optional)
+S3BUCKET="mybackupbukket"
+
 ####################
 
 
@@ -114,3 +117,6 @@ ssh -p ${sshport[0]} ${remoterotate[0]} ${backupname}.tar 10 ${backupname}
 ## Comment 2 lines below out if only one server is in use
 scp -P ${sshport[1]} ${spooler}${backupname}.tar ${remote[1]}
 ssh -p ${sshport[1]} ${remoterotate[1]} ${backupname}.tar 10 ${backupname}
+
+## An example to store your backup at AWS S3 storage, uncomment to use
+# /usr/local/bin/s3cmd put ${spooler}${backupname}.tar s3://${S3BUCKET}/${backupname}.tar --multipart-chunk-size-mb=100
