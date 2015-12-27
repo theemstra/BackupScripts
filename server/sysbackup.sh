@@ -24,12 +24,12 @@
 #
 ##
 ## Edit the config section below to fit your needs.
-## Simply comment out the 2nd remote at the bottom of the script to disable it.
+## Simply comment out any parts you don't want to use.
 ## By default some folders are being backed-up, as well as all MySQL databases.
 ##
 #
 
-###### Config ######
+###### START CONFIG ######
 ## Your backup name
 backupname="{YOUR BACKUP NAME}"
 
@@ -37,8 +37,8 @@ backupname="{YOUR BACKUP NAME}"
 spooler="/var/spool/backup-prepare/system/"
 
 ## Your remote server hostname(s)
-host[0]="myserver.sys.mycompany.tld"
-host[1]="mysecond.sts.mycompany.tld"
+host[0]="backupserver.mycompany.tld"
+host[1]="nas.mycompany.tld"
 
 ## Your remote server locations (Comment one out if you only use one)
 remote[0]="root@${HOST[0]}:/home/backups/${backupname}/"
@@ -52,15 +52,22 @@ sshport[1]="9901"
 remoterotate[0]="root@{YOUR_HOST1} /root/scripts/backup/${backupname}-rotate.sh"
 remoterotate[1]="root@{YOUR_HOST2} /volume1/Backups/scripts/${backupname}-rotate.sh"
 
-## Your database password if you do not have automatic mysql sign-in set up (leave empty if you have it set up)
-## It is not recommended to put your root password in here, because it would be readable via top and ps ax.
+## Your database password if you do not have an option-file (http://dev.mysql.com/doc/refman/5.6/en/password-security-user.html)
+## Leave "" if you have a option file set up
+## WARNING: It is not recommended to put your password in here, because it would be readable via top and ps ax.
 DB_PASSWORD="YOUR_PASSWORD"
 
-## Your S3 bukket name (optional)
+### S3 configuration, uncomment the last line of this file to enable this feature.
+## It's important that S3cmd is installed and set up before using this feature.
+
+## Your S3 bukket name 
 S3BUCKET="mybackupbukket"
+## Choose the path inside your bukket (Default: Empty) (END WITHOUT SLASH)
+S3PATH=""
+## Choose what chunk size each chunk sent to S3 should be (Default: 25)
+CHUNKSIZE=25
 
-####################
-
+###### END CONFIG ######
 
 ## We're checking if the folders exist, if not, let's create them
 if [ ! -d ${spooler} ]; then
@@ -73,7 +80,7 @@ if [ ! -d ${spooler}part/db ]; then
         mkdir -p ${spooler}part/db
 fi
 
-## Add folders you would like to be backed-up here
+## Add folders you would like to be backed-up here (example)
 tar -cpzf ${spooler}part/conf/proftpd.tar.gz -C / etc/proftpd
 tar -cpzf ${spooler}part/conf/postfix.tar.gz -C / etc/postfix
 tar -cpzf ${spooler}part/conf/dovecot.tar.gz -C / etc/dovecot
@@ -90,7 +97,7 @@ tar -cpz --warning=no-file-changed --warning=no-file-removed -f ${spooler}part/v
 tar -cpz --warning=no-file-changed --warning=no-file-removed -f ${spooler}part/root.tar.gz -C / root
 tar -cpz --warning=no-file-changed --warning=no-file-removed -f ${spooler}part/mail.tar.gz -C / var/mail
 
-## Before we're going to pack, let's optimize the databases
+## Before we're going to pack, let's repair and optimize the databases
 mysqlcheck -u root -p --auto-repair --optimize --all-databases | grep -v ^performance_schema$
 
 ## Let's loop through all databases and pack them
@@ -118,5 +125,5 @@ ssh -p ${sshport[0]} ${remoterotate[0]} ${backupname}.tar 10 ${backupname}
 scp -P ${sshport[1]} ${spooler}${backupname}.tar ${remote[1]}
 ssh -p ${sshport[1]} ${remoterotate[1]} ${backupname}.tar 10 ${backupname}
 
-## An example to store your backup at AWS S3 storage, uncomment to use
-# /usr/local/bin/s3cmd put ${spooler}${backupname}.tar s3://${S3BUCKET}/${backupname}.tar --multipart-chunk-size-mb=100
+## An example to store your backup at AWS S3 storage (install and configure s3cmd first) (http://s3tools.org/s3cmd)
+/usr/local/bin/s3cmd put ${spooler}${backupname}.tar s3://${S3BUCKET}/${S3PATH}/${backupname}.tar --multipart-chunk-size-mb=${CHUNKSIZE}
