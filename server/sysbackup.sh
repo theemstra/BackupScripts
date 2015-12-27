@@ -64,8 +64,8 @@ DB_PASSWORD="YOUR_PASSWORD"
 S3BUCKET="mybackupbukket"
 ## Choose the path inside your bukket (Default: Empty) (END WITHOUT SLASH)
 S3PATH=""
-## Choose what chunk size each chunk sent to S3 should be (Default: 25)
-CHUNKSIZE=25
+## Choose what chunk size each chunk sent to S3 should be (Default: "25")
+CHUNKSIZE="25"
 
 ###### END CONFIG ######
 
