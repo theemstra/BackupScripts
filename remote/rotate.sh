@@ -21,13 +21,13 @@
 # @author      Thom Heemstra <thom@heemstra.xyz>
 # @license     http://www.gnu.org/licenses/gpl-2.0.html GPL v2
 
-##
-#
-#  This Backup rotation script will remove backups that are older than <days_to_keep_backup_for> old.
-#  This script will be called from the backup script, but can be used seperately.
-#  Backup files will look like
 #
 ##
+## This Backup rotation script will remove backups that are older than <days_to_keep_backup_for> old.
+## This script will be called from the backup script, but can be used seperately.
+## Backup files will look like
+##
+#
 
 ###### HOW TO USE ######
 
