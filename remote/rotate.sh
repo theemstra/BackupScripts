@@ -27,7 +27,6 @@
 #  This script will be called from the backup script, but can be used seperately.
 #  Backup files will look like
 #
-#
 ##
 
 ###### HOW TO USE ######
