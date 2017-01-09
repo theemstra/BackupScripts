@@ -81,6 +81,8 @@ bb_key="YOUR SECRET KEY"
 
 ###### END CONFIG ######
 
+###### START BACKUP ######
+
 ## We're checking if the folders exist, if not, let's create them
 if [ ! -d ${spooler} ]; then
         mkdir -p ${spooler}
@@ -137,9 +139,13 @@ ssh -p ${sshport[0]} ${remoterotate[0]} ${basename} 10
 scp -P ${sshport[1]} ${spooler}${basename}.tar ${remote[1]}
 ssh -p ${sshport[1]} ${remoterotate[1]} ${basename} 10
 
+### External backup features; uncomment to enable. Make sure to install and configure (and test) before enabling.
+
 ## An example to store your backup at AWS S3 storage (install and configure s3cmd first) (http://s3tools.org/s3cmd)
 #/usr/local/bin/s3cmd put ${spooler}${basename}.tar s3://${S3BUCKET}/${S3PATH}/${basename}.tar --multipart-chunk-size-mb=${CHUNKSIZE}
 
 ## An example to store your backup at BackBlaze B2 storage (install and configure b2 first) (https://www.backblaze.com/b2/docs/quick_command_line.html)
 #${b2_location} authorize_account ${bb_id} ${bb_key}
 #${b2_location} upload_file --noProgress --threads 1 ${b2_bucket} ${spooler}${backupname}-${TDAY}.tar ${backupname}.tar
+
+###### END BACKUP ######
