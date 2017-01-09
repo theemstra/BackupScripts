@@ -1,6 +1,6 @@
 #!/bin/bash
 # Backup & Rotation Scripts
-# Copyright 2010-2015 by XSbyte
+# Copyright 2010-2017 by XSbyte
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -17,37 +17,62 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 # @category    XSbyte
-# @copyright   2010-2015 by XSbyte | http://www.xsbyte.com
-# @author      Thom Heemstra <thom@heemstra.us>
+# @copyright   2010-2017 by XSbyte | https://xsbyte.com
+# @author      Thom Heemstra <thom@heemstra.xyz>
 # @license     http://www.gnu.org/licenses/gpl-2.0.html GPL v2
 
+##
 #
-## Make sure to change the name of this file to reflect the backup name!
-## Also fill out the location below
+#  This Backup rotation script will remove backups that are older than <days_to_keep_backup_for> old.
+#  This script will be called from the backup script, but can be used seperately.
+#  Backup files will look like
 #
+#
+##
 
-###### Config ######
+###### HOW TO USE ######
 
-## Add the location to your backup dir here eg(/home/user/backups/machinename/)
-location="/home/user/backups/machinename/"
+if [ $# -lt 2 ]
+then 
+    echo "Error - Please supply at least 2 arguments"
+    echo ""
+    echo "  USAGE  : ${0} <basename> <days_to_keep_backup_for> [<location>]"
+    echo ""
+    echo "  Example: backuprotate.sh mars 21"
+    exit
+fi
 
-####################
+###### CONFIG ######
+# Here you can set and override some default settings.
 
+defaultlocation="/volume1/Backups/servers/${basename}/"
+location=""
 basename=$1
-numbertokeep=$2
-## This location has to match the server backup's location for the rotate to work.
+days_to_keep=$2
 
-loopstart=$((numbertokeep-1))
+###### CHECKS ######
 
-if [ -f ${location}${basename}.${numbertokeep} ]; then
-    rm ${location}${basename}.${numbertokeep}; fi
+# Where should we store data? If $3 is not given, use default location.
+if [ -z $3 ]
+then
+	location=defaultlocation
+else
+	location=${3%/}
+fi
 
-for ((i=loopstart; i>=1; i--))
-do
-    new=$(($i+1))
-    if [ -f ${location}${basename}.${i} ]; then
-        mv ${location}${basename}.${i} ${location}${basename}.${new}
-    fi
-done
+# Days to keep must be greater than 0, if not, give error.
+if [ $days_to_keep -eq 0 ]
+then
+	echo "Error - Invalid no. of days. days_to_keep_backup_for should be >= 0"
+	exit
+fi
 
-mv ${location}${basename} ${location}${basename}.1
+###### ROTATE ######
+
+# Now let's find older versions and remove them
+find ${location} -maxdepth 1 -name "${basename}-*.*" \
+		-mmin +$((60*24*$days_to_keep)) -type f \
+		-exec rm -r {} \;
+
+echo "Success - Files Removed ..."
+exit
