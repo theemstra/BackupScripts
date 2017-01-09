@@ -1,6 +1,6 @@
 #!/bin/bash
 # Backup & Rotation Scripts
-# Copyright 2010-2015 by XSbyte
+# Copyright 2010-2017 by XSbyte
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -17,8 +17,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 # @category    XSbyte
-# @copyright   2010-2015 by XSbyte | http://www.xsbyte.com
-# @author      Thom Heemstra <thom@heemstra.us>
+# @copyright   2010-2017 by XSbyte | https://xsbyte.com
+# @author      Thom Heemstra <thom@heemstra.xyz>
 # @license     http://www.gnu.org/licenses/gpl-2.0.html GPL v2
 
 #
@@ -31,7 +31,7 @@
 
 ###### START CONFIG ######
 ## Your backup name
-backupname="{YOUR BACKUP NAME}"
+basename="{YOUR BACKUP NAME}"
 
 ## Where we'll prepare the backup for packaging
 spooler="/var/spool/backup-prepare/system/"
@@ -41,31 +41,43 @@ host[0]="backupserver.mycompany.tld"
 host[1]="nas.mycompany.tld"
 
 ## Your remote server locations (Comment one out if you only use one)
-remote[0]="root@${HOST[0]}:/home/backups/${backupname}/"
-remote[1]="root@${HOST[1]}:/volume1/Backups/${backupname}"
+remote[0]="root@${HOST[0]}:/home/backups/${basename}/"
+remote[1]="root@${HOST[1]}:/volume1/Backups/${basename}"
 
 ## Your SSH ports (22 by default)
 sshport[0]="22"
 sshport[1]="9901"
 
 ## Where is the remote rotations script located?
-remoterotate[0]="root@{YOUR_HOST1} /root/scripts/backup/${backupname}-rotate.sh"
-remoterotate[1]="root@{YOUR_HOST2} /volume1/Backups/scripts/${backupname}-rotate.sh"
+remoterotate[0]="root@{YOUR_HOST1} /root/scripts/backup/rotate.sh"
+remoterotate[1]="root@{YOUR_HOST2} /volume1/Backups/scripts/rotate.sh"
 
 ## Your database password if you do not have an option-file (http://dev.mysql.com/doc/refman/5.6/en/password-security-user.html)
 ## Leave "" if you have a option file set up
 ## WARNING: It is not recommended to put your password in here, because it would be readable via top and ps ax.
 DB_PASSWORD="YOUR_PASSWORD"
 
-### S3 configuration, uncomment the last line of this file to enable this feature.
+### S3 configuration, uncomment the specific line at the end of the file to enable this feature
 ## It's important that S3cmd is installed and set up before using this feature.
 
-## Your S3 bukket name 
+## Your S3 bucket name 
 S3BUCKET="mybackupbukket"
 ## Choose the path inside your bukket (Default: Empty) (END WITHOUT SLASH)
 S3PATH=""
 ## Choose what chunk size each chunk sent to S3 should be (Default: "25")
 CHUNKSIZE="25"
+
+### B2 configuration, uncomment the specific line at the end of the file to enable this feature
+
+## Where is B2 located? (you can comment out the command later)
+b2_location="/usr/local/bin/b2"
+
+## What will be your bucket name?
+b2_bucket="backups"
+
+## Authentication details for B2
+bb_id="YOUR ACCOUNT ID"
+bb_key="YOUR SECRET KEY"
 
 ###### END CONFIG ######
 
@@ -111,19 +123,23 @@ tar -cf ${spooler}part/db.tar -C ${spooler}part/db .
 rm ${spooler}part/db/*
 rmdir ${spooler}part/db
 
-rm ${spooler}${backupname}.tar
+rm ${spooler}${basename}.tar
 
-tar -cf ${spooler}${backupname}.tar -C ${spooler}part .
+tar -cf ${spooler}${basename}.tar -C ${spooler}part .
 rm ${spooler}part/*
 
 ## Now let's upload it to server 0
-scp -P ${sshport[0]} ${spooler}${backupname}.tar ${remote[0]}
-ssh -p ${sshport[0]} ${remoterotate[0]} ${backupname}.tar 10 ${backupname}
+scp -P ${sshport[0]} ${spooler}${basename}.tar ${remote[0]}
+ssh -p ${sshport[0]} ${remoterotate[0]} ${basename} 10
 
 ## Now let's upload it to server 1
 ## Comment 2 lines below out if only one server is in use
-scp -P ${sshport[1]} ${spooler}${backupname}.tar ${remote[1]}
-ssh -p ${sshport[1]} ${remoterotate[1]} ${backupname}.tar 10 ${backupname}
+scp -P ${sshport[1]} ${spooler}${basename}.tar ${remote[1]}
+ssh -p ${sshport[1]} ${remoterotate[1]} ${basename} 10
 
 ## An example to store your backup at AWS S3 storage (install and configure s3cmd first) (http://s3tools.org/s3cmd)
-/usr/local/bin/s3cmd put ${spooler}${backupname}.tar s3://${S3BUCKET}/${S3PATH}/${backupname}.tar --multipart-chunk-size-mb=${CHUNKSIZE}
+#/usr/local/bin/s3cmd put ${spooler}${basename}.tar s3://${S3BUCKET}/${S3PATH}/${basename}.tar --multipart-chunk-size-mb=${CHUNKSIZE}
+
+## An example to store your backup at BackBlaze B2 storage (install and configure b2 first) (https://www.backblaze.com/b2/docs/quick_command_line.html)
+#${b2_location} authorize_account ${bb_id} ${bb_key}
+#${b2_location} upload_file --noProgress --threads 1 ${b2_bucket} ${spooler}${backupname}-${TDAY}.tar ${backupname}.tar
